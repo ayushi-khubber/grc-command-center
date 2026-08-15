@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <p class="text-muted">Point-in-time view of organizational risk and compliance posture.</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi-card">
+    <div class="kpi-value">{{ risks|length }}</div>
+    <div class="kpi-label">Total Risks Tracked</div>
+  </div>
+  <div class="kpi-card kpi-danger">
+    <div class="kpi-value">{{ band_counts['Critical'] + band_counts['High'] }}</div>
+    <div class="kpi-label">High / Critical Risks</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">{{ control_implementation_pct }}%</div>
+    <div class="kpi-label">Controls Implemented ({{ total_controls }} total)</div>
+  </div>
+  <div class="kpi-card kpi-warn">
+    <div class="kpi-value">{{ high_sev_open|length }}</div>
+    <div class="kpi-label">Open High/Critical Findings</div>
+  </div>
+  <div class="kpi-card kpi-warn">
+    <div class="kpi-value">{{ overdue_policies|length + overdue_vendors|length }}</div>
+    <div class="kpi-label">Overdue Reviews (Policy + Vendor)</div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="panel">
+      <h2>Risk Heat Map</h2>
+      <p class="text-muted small">Likelihood (rows) x Impact (columns). Cell shows number of risks.</p>
+      <table class="heatmap">
+        <tr>
+          <td class="axis-label"></td>
+          {% for i in range(1,6) %}<td class="axis-head">I{{ i }}</td>{% endfor %}
+        </tr>
+        {% for l in range(5,0,-1) %}
+        <tr>
+          <td class="axis-head">L{{ l }}</td>
+          {% for i in range(1,6) %}
+            {% set score = l * i %}
+            {% set band, cls = risk_band(score) %}
+            {% set count = matrix.get((l, i), 0) %}
+            <td class="heat-cell {{ cls }}">{{ count if count > 0 else '' }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </table>
+      <div class="legend">
+        <span class="legend-item"><i class="band-low"></i> Low</span>
+        <span class="legend-item"><i class="band-medium"></i> Medium</span>
+        <span class="legend-item"><i class="band-high"></i> High</span>
+        <span class="legend-item"><i class="band-critical"></i> Critical</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="panel">
+      <h2>Control Implementation Status</h2>
+      <table class="table table-sm">
+        <tbody>
+        {% for status, count in control_status_counts.items() %}
+          <tr>
+            <td>{{ status }}</td>
+            <td class="text-end">{{ count }}</td>
+            <td style="width:50%">
+              <div class="progress" style="height:10px;">
+                <div class="progress-bar" role="progressbar" style="width: {{ (100*count/total_controls)|round }}%"></div>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel mt-4">
+      <h2>Needs Attention</h2>
+      <ul class="attention-list">
+        {% for f in high_sev_open %}
+          <li><span class="badge-sev sev-{{ f['severity']|lower }}">{{ f['severity'] }}</span> {{ f['description'] }} — due {{ f['due_date'] }}</li>
+        {% endfor %}
+        {% for p in overdue_policies %}
+          <li><span class="badge-sev sev-medium">Policy</span> "{{ p['name'] }}" review overdue since {{ p['next_review'] }}</li>
+        {% endfor %}
+        {% for v in overdue_vendors %}
+          <li><span class="badge-sev sev-medium">Vendor</span> {{ v['name'] }} assessment overdue since {{ v['next_assessment'] }}</li>
+        {% endfor %}
+        {% if not high_sev_open and not overdue_policies and not overdue_vendors %}
+          <li class="text-muted">Nothing overdue right now.</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

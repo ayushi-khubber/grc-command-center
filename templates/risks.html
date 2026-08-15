@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h1>Risk Register</h1>
+    <p class="text-muted">Inherent risk = Likelihood x Impact. Add mitigating controls to reduce residual risk.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('export_risks') }}" class="btn btn-outline-secondary btn-sm">Export CSV</a>
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addRiskModal">+ Add Risk</button>
+  </div>
+</div>
+
+<div class="panel">
+<table class="table table-hover align-middle">
+  <thead>
+    <tr>
+      <th>Title</th><th>Category</th><th>L x I</th><th>Score</th><th>Band</th>
+      <th>Residual</th><th>Owner</th><th>Status</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in risks %}
+    {% set score = risk_score(r['likelihood'], r['impact']) %}
+    {% set band, cls = risk_band(score) %}
+    {% set rscore = risk_score(r['residual_likelihood'], r['residual_impact']) %}
+    {% set rband, rcls = risk_band(rscore) %}
+    <tr>
+      <td>
+        <div class="fw-semibold">{{ r['title'] }}</div>
+        <div class="text-muted small">{{ r['description'] }}</div>
+      </td>
+      <td>{{ r['category'] }}</td>
+      <td>{{ r['likelihood'] }} x {{ r['impact'] }}</td>
+      <td>{{ score }}</td>
+      <td><span class="pill {{ cls }}">{{ band }}</span></td>
+      <td>
+        {% if r['residual_likelihood'] %}
+          <span class="pill {{ rcls }}">{{ rband }} ({{ rscore }})</span>
+        {% else %}<span class="text-muted">—</span>{% endif %}
+      </td>
+      <td>{{ r['owner'] }}</td>
+      <td>{{ r['status'] }}</td>
+      <td class="text-end">
+        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editRisk{{ r['id'] }}">Edit</button>
+        <form method="post" action="{{ url_for('risks_delete', risk_id=r['id']) }}" class="d-inline" onsubmit="return confirm('Delete this risk?');">
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+
+    <div class="modal fade" id="editRisk{{ r['id'] }}" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('risks_edit', risk_id=r['id']) }}">
+            <div class="modal-header"><h5 class="modal-title">Edit Risk</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+              {% include 'risk_form_fields.html' with context %}
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="modal fade" id="addRiskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('risks_add') }}">
+        <div class="modal-header"><h5 class="modal-title">Add Risk</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          {% set r = None %}
+          {% include 'risk_form_fields.html' with context %}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Add Risk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h1>Control Mapping</h1>
+    <p class="text-muted">Controls mapped to the NIST Cybersecurity Framework (CSF) 2.0 functions.</p>
+  </div>
+  <a href="{{ url_for('export_controls') }}" class="btn btn-outline-secondary btn-sm">Export CSV</a>
+</div>
+
+{% for func in functions %}
+<div class="panel">
+  <h2>{{ func }}</h2>
+  <table class="table table-hover align-middle">
+    <thead><tr><th>ID</th><th>Category</th><th>Description</th><th>Status</th><th>Owner</th><th>Evidence</th><th>Updated</th><th></th></tr></thead>
+    <tbody>
+      {% for c in controls if c['function'] == func %}
+      <tr>
+        <td class="fw-semibold">{{ c['id'] }}</td>
+        <td>{{ c['category'] }}</td>
+        <td class="small">{{ c['description'] }}</td>
+        <td>
+          {% set map = {'Implemented':'status-good','In Progress':'status-mid','Not Started':'status-bad','Not Applicable':'status-neutral'} %}
+          <span class="pill {{ map.get(c['status'], 'status-neutral') }}">{{ c['status'] }}</span>
+        </td>
+        <td>{{ c['owner'] }}</td>
+        <td class="small text-muted">{{ c['evidence'] }}</td>
+        <td class="small">{{ c['last_updated'] }}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ctrl{{ c['id'] }}">Update</button>
+        </td>
+      </tr>
+      <div class="modal fade" id="ctrl{{ c['id'] }}" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form method="post" action="{{ url_for('controls_update', control_id=c['id']) }}">
+              <div class="modal-header"><h5 class="modal-title">{{ c['id'] }} — {{ c['category'] }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+              <div class="modal-body">
+                <label class="form-label">Status</label>
+                <select class="form-select mb-3" name="status">
+                  {% for s in ['Not Started','In Progress','Implemented','Not Applicable'] %}
+                    <option {{ 'selected' if c['status']==s }}>{{ s }}</option>
+                  {% endfor %}
+                </select>
+                <label class="form-label">Owner</label>
+                <input class="form-control mb-3" name="owner" value="{{ c['owner'] }}">
+                <label class="form-label">Evidence / Notes</label>
+                <textarea class="form-control" name="evidence" rows="3">{{ c['evidence'] }}</textarea>
+              </div>
+              <div class="modal-footer"><button class="btn btn-primary">Save</button></div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+{% endblock %}

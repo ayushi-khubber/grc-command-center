@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h1>Policies</h1>
+    <p class="text-muted">Policy inventory with review cadence tracking.</p>
+  </div>
+  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPolicyModal">+ Add Policy</button>
+</div>
+
+<div class="panel">
+<table class="table table-hover align-middle">
+  <thead><tr><th>Policy</th><th>Category</th><th>Version</th><th>Owner</th><th>Last Review</th><th>Next Review</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for p in policies %}
+    {% set nd = parse_date(p['next_review']) %}
+    {% set overdue = nd and nd < today %}
+    <tr class="{{ 'row-overdue' if overdue else '' }}">
+      <td class="fw-semibold">{{ p['name'] }}</td>
+      <td>{{ p['category'] }}</td>
+      <td>{{ p['version'] }}</td>
+      <td>{{ p['owner'] }}</td>
+      <td>{{ p['last_review'] }}</td>
+      <td>{{ p['next_review'] }} {% if overdue %}<span class="badge-overdue">Overdue</span>{% endif %}</td>
+      <td>{{ p['status'] }}</td>
+      <td class="text-end">
+        <form method="post" action="{{ url_for('policies_delete', policy_id=p['id']) }}" class="d-inline" onsubmit="return confirm('Delete this policy?');">
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="modal fade" id="addPolicyModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('policies_add') }}">
+        <div class="modal-header"><h5 class="modal-title">Add Policy</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Policy Name</label><input class="form-control" name="name" required></div>
+            <div class="col-md-6"><label class="form-label">Category</label><input class="form-control" name="category"></div>
+            <div class="col-md-4"><label class="form-label">Version</label><input class="form-control" name="version"></div>
+            <div class="col-md-4"><label class="form-label">Owner</label><input class="form-control" name="owner"></div>
+            <div class="col-md-4"><label class="form-label">Status</label>
+              <select class="form-select" name="status"><option>Draft</option><option>Under Review</option><option selected>Approved</option></select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Last Review Date</label><input type="date" class="form-control" name="last_review"></div>
+            <div class="col-md-6"><label class="form-label">Next Review Date</label><input type="date" class="form-control" name="next_review"></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary">Add Policy</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

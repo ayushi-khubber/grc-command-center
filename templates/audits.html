@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h1>Audit Findings</h1>
+    <p class="text-muted">Internal and external audit findings with remediation tracking.</p>
+  </div>
+  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addFindingModal">+ Add Finding</button>
+</div>
+
+<div class="panel">
+<table class="table table-hover align-middle">
+  <thead><tr><th>Finding</th><th>Source</th><th>Severity</th><th>Control</th><th>Remediation</th><th>Owner</th><th>Due</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for f in findings %}
+    {% set nd = parse_date(f['due_date']) %}
+    {% set overdue = nd and nd < today and f['status'] != 'Closed' %}
+    <tr class="{{ 'row-overdue' if overdue else '' }}">
+      <td class="small">{{ f['description'] }}</td>
+      <td>{{ f['source'] }}</td>
+      <td><span class="badge-sev sev-{{ f['severity']|lower }}">{{ f['severity'] }}</span></td>
+      <td>{{ f['control_ref'] }}</td>
+      <td class="small text-muted">{{ f['remediation_plan'] }}</td>
+      <td>{{ f['owner'] }}</td>
+      <td>{{ f['due_date'] }}{% if overdue %} <span class="badge-overdue">Overdue</span>{% endif %}</td>
+      <td>
+        <form method="post" action="{{ url_for('audits_update', finding_id=f['id']) }}" class="d-flex gap-1">
+          <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+            {% for s in ['Open','In Progress','Closed'] %}
+              <option {{ 'selected' if f['status']==s }}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </td>
+      <td class="text-end">
+        <form method="post" action="{{ url_for('audits_delete', finding_id=f['id']) }}" class="d-inline" onsubmit="return confirm('Delete this finding?');">
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="modal fade" id="addFindingModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('audits_add') }}">
+        <div class="modal-header"><h5 class="modal-title">Add Audit Finding</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12"><label class="form-label">Description</label><textarea class="form-control" name="description" required rows="2"></textarea></div>
+            <div class="col-md-6"><label class="form-label">Source</label><input class="form-control" name="source" placeholder="Internal Audit / External Audit"></div>
+            <div class="col-md-6"><label class="form-label">Severity</label>
+              <select class="form-select" name="severity"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option></select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Related Control ID</label><input class="form-control" name="control_ref" placeholder="e.g. PR.AA-01"></div>
+            <div class="col-md-6"><label class="form-label">Owner</label><input class="form-control" name="owner"></div>
+            <div class="col-md-6"><label class="form-label">Due Date</label><input type="date" class="form-control" name="due_date"></div>
+            <div class="col-md-6"><label class="form-label">Status</label>
+              <select class="form-select" name="status"><option selected>Open</option><option>In Progress</option><option>Closed</option></select>
+            </div>
+            <div class="col-12"><label class="form-label">Remediation Plan</label><textarea class="form-control" name="remediation_plan" rows="2"></textarea></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary">Add Finding</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

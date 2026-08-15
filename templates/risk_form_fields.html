@@ -1,0 +1,54 @@
+<div class="row g-3">
+  <div class="col-md-8">
+    <label class="form-label">Title</label>
+    <input class="form-control" name="title" required value="{{ r['title'] if r else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Category</label>
+    <select class="form-select" name="category">
+      {% for cat in ['Cyber','Operational','Third-Party','Compliance','Data Privacy','Financial','Strategic'] %}
+        <option {{ 'selected' if r and r['category']==cat }}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12">
+    <label class="form-label">Description</label>
+    <textarea class="form-control" name="description" rows="2">{{ r['description'] if r else '' }}</textarea>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Likelihood (1-5)</label>
+    <input type="number" min="1" max="5" class="form-control" name="likelihood" required value="{{ r['likelihood'] if r else 3 }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Impact (1-5)</label>
+    <input type="number" min="1" max="5" class="form-control" name="impact" required value="{{ r['impact'] if r else 3 }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Residual Likelihood</label>
+    <input type="number" min="1" max="5" class="form-control" name="residual_likelihood" value="{{ r['residual_likelihood'] if r else '' }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Residual Impact</label>
+    <input type="number" min="1" max="5" class="form-control" name="residual_impact" value="{{ r['residual_impact'] if r else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Owner</label>
+    <input class="form-control" name="owner" value="{{ r['owner'] if r else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Status</label>
+    <select class="form-select" name="status">
+      {% for s in ['Open','In Progress','Mitigated','Accepted','Closed'] %}
+        <option {{ 'selected' if r and r['status']==s }}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Date Identified</label>
+    <input type="date" class="form-control" name="date_identified" value="{{ r['date_identified'] if r else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Mitigating Controls</label>
+    <input class="form-control" name="mitigating_controls" value="{{ r['mitigating_controls'] if r else '' }}">
+  </div>
+</div>

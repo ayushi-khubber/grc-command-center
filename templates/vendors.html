@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h1>Vendor Risk</h1>
+    <p class="text-muted">Third-party risk tiering and assessment cadence.</p>
+  </div>
+  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addVendorModal">+ Add Vendor</button>
+</div>
+
+<div class="panel">
+<table class="table table-hover align-middle">
+  <thead><tr><th>Vendor</th><th>Service</th><th>Data Access</th><th>Risk Tier</th><th>Last Assessed</th><th>Next Due</th><th>Findings</th><th></th></tr></thead>
+  <tbody>
+    {% for v in vendors %}
+    {% set nd = parse_date(v['next_assessment']) %}
+    {% set overdue = nd and nd < today %}
+    <tr class="{{ 'row-overdue' if overdue else '' }}">
+      <td class="fw-semibold">{{ v['name'] }}</td>
+      <td>{{ v['service'] }}</td>
+      <td>{{ v['data_access'] }}</td>
+      <td><span class="pill tier-{{ v['risk_tier']|lower }}">{{ v['risk_tier'] }}</span></td>
+      <td>{{ v['last_assessment'] }}</td>
+      <td>{{ v['next_assessment'] }} {% if overdue %}<span class="badge-overdue">Overdue</span>{% endif %}</td>
+      <td class="small text-muted">{{ v['findings'] }}</td>
+      <td class="text-end">
+        <form method="post" action="{{ url_for('vendors_delete', vendor_id=v['id']) }}" class="d-inline" onsubmit="return confirm('Remove this vendor?');">
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="modal fade" id="addVendorModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('vendors_add') }}">
+        <div class="modal-header"><h5 class="modal-title">Add Vendor</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Vendor Name</label><input class="form-control" name="name" required></div>
+            <div class="col-md-6"><label class="form-label">Service Provided</label><input class="form-control" name="service"></div>
+            <div class="col-md-6"><label class="form-label">Data Access</label><input class="form-control" name="data_access"></div>
+            <div class="col-md-6"><label class="form-label">Risk Tier</label>
+              <select class="form-select" name="risk_tier"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option></select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Last Assessment</label><input type="date" class="form-control" name="last_assessment"></div>
+            <div class="col-md-6"><label class="form-label">Next Assessment Due</label><input type="date" class="form-control" name="next_assessment"></div>
+            <div class="col-12"><label class="form-label">Findings / Notes</label><textarea class="form-control" name="findings" rows="2"></textarea></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary">Add Vendor</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

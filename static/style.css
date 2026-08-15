@@ -1,0 +1,103 @@
+:root{
+  --navy:#101a2b;
+  --navy-light:#16223a;
+  --accent:#3d7bfd;
+  --low:#2e9e5b;
+  --medium:#e3a92a;
+  --high:#e0722c;
+  --critical:#d5433d;
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --text:#1a2233;
+  --muted:#6b7686;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+
+.sidebar{
+  width:230px;
+  min-height:100vh;
+  background:var(--navy);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.sidebar-brand{padding:24px 20px 12px;}
+.brand-mark{font-weight:800;font-size:1.4rem;letter-spacing:1px;color:var(--accent);}
+.brand-sub{font-size:.75rem;color:#9aa7bd;text-transform:uppercase;letter-spacing:1px;}
+.sidebar .nav{margin-top:16px;flex:1;}
+.sidebar .nav-link{
+  color:#c4cde0;
+  padding:10px 20px;
+  font-size:.92rem;
+  border-left:3px solid transparent;
+}
+.sidebar .nav-link:hover{color:#fff;background:var(--navy-light);}
+.sidebar .nav-link.active{color:#fff;background:var(--navy-light);border-left-color:var(--accent);font-weight:600;}
+.sidebar-footer{padding:16px 20px;font-size:.72rem;color:#5c6b85;border-top:1px solid #223050;}
+
+.content{flex:1;padding:32px 40px;max-width:1400px;}
+.flash-wrap{margin-bottom:16px;}
+
+.page-header h1{font-weight:700;margin-bottom:2px;}
+.page-header{margin-bottom:24px;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;}
+.kpi-card{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(20,30,60,.08);border-left:4px solid var(--accent);}
+.kpi-card.kpi-danger{border-left-color:var(--critical);}
+.kpi-card.kpi-warn{border-left-color:var(--high);}
+.kpi-value{font-size:1.9rem;font-weight:800;line-height:1;}
+.kpi-label{font-size:.8rem;color:var(--muted);margin-top:6px;}
+
+.panel{background:var(--card);border-radius:12px;padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.08);margin-bottom:24px;}
+.panel h2{font-size:1.05rem;font-weight:700;margin-bottom:12px;}
+
+.heatmap{border-collapse:collapse;width:100%;}
+.heatmap td{text-align:center;padding:10px;border:1px solid #eef0f5;font-size:.85rem;}
+.axis-head{font-weight:700;color:var(--muted);font-size:.75rem;background:#fafbfd;}
+.heat-cell{font-weight:700;color:#fff;min-width:40px;}
+
+.band-low, .heat-cell.band-low{background:var(--low);}
+.band-medium, .heat-cell.band-medium{background:var(--medium);}
+.band-high, .heat-cell.band-high{background:var(--high);}
+.band-critical, .heat-cell.band-critical{background:var(--critical);}
+
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;color:#fff;}
+.pill.band-low{background:var(--low);}
+.pill.band-medium{background:var(--medium);color:#3a2c00;}
+.pill.band-high{background:var(--high);}
+.pill.band-critical{background:var(--critical);}
+.pill.status-good{background:var(--low);}
+.pill.status-mid{background:var(--medium);color:#3a2c00;}
+.pill.status-bad{background:var(--critical);}
+.pill.status-neutral{background:#9aa3b5;}
+.pill.tier-critical{background:var(--critical);}
+.pill.tier-high{background:var(--high);}
+.pill.tier-medium{background:var(--medium);color:#3a2c00;}
+.pill.tier-low{background:var(--low);}
+
+.legend{margin-top:14px;font-size:.8rem;color:var(--muted);}
+.legend-item{margin-right:16px;}
+.legend-item i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;}
+
+.badge-sev{padding:3px 9px;border-radius:6px;font-size:.72rem;font-weight:700;color:#fff;}
+.sev-critical{background:var(--critical);}
+.sev-high{background:var(--high);}
+.sev-medium{background:var(--medium);color:#3a2c00;}
+.sev-low{background:var(--low);}
+
+.badge-overdue{background:var(--critical);color:#fff;font-size:.68rem;padding:2px 7px;border-radius:5px;margin-left:6px;}
+.row-overdue{background:#fdf2f1;}
+
+.attention-list{list-style:none;padding:0;margin:0;}
+.attention-list li{padding:8px 0;border-bottom:1px solid #f0f1f5;font-size:.88rem;}
+.attention-list li:last-child{border-bottom:none;}
+
+table.table{font-size:.9rem;}
