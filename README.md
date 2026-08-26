@@ -1,6 +1,6 @@
 # GRC Command Center
 
-A self-contained Governance, Risk & Compliance management tool built with Python/Flask + SQLite.
+A self-contained Governance, Risk & Compliance management tool built with Python/Flask and SQLite.
 
 ## What it does
 
