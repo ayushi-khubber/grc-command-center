@@ -1,10 +1,3 @@
-"""
-GRC Command Center
-A self-contained Governance, Risk & Compliance management tool.
-Risk register, control-framework mapping (NIST CSF 2.0), vendor risk,
-audit findings tracking, and policy lifecycle management.
-"""
-
 from flask import Flask, render_template, request, redirect, url_for, flash, Response
 import sqlite3
 import os
@@ -20,10 +13,7 @@ app.secret_key = 'dev-secret-key-change-me'
 
 TODAY = datetime.today().date()
 
-
-# ---------------------------------------------------------------------------
 # Database
-# ---------------------------------------------------------------------------
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -178,10 +168,7 @@ def seed_data(conn):
 
     conn.commit()
 
-
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 
 def risk_score(likelihood, impact):
     if likelihood is None or impact is None:
@@ -208,10 +195,7 @@ def parse_date(s):
 
 app.jinja_env.globals.update(risk_score=risk_score, risk_band=risk_band)
 
-
-# ---------------------------------------------------------------------------
 # Dashboard
-# ---------------------------------------------------------------------------
 
 @app.route('/')
 def dashboard():
@@ -261,10 +245,7 @@ def dashboard():
                             vendors=vendors,
                             today=TODAY)
 
-
-# ---------------------------------------------------------------------------
 # Risk Register
-# ---------------------------------------------------------------------------
 
 @app.route('/risks')
 def risks_list():
@@ -335,10 +316,7 @@ def export_risks():
     return Response(output.getvalue(), mimetype='text/csv',
                      headers={'Content-Disposition': 'attachment;filename=risk_register.csv'})
 
-
-# ---------------------------------------------------------------------------
 # Controls
-# ---------------------------------------------------------------------------
 
 @app.route('/controls')
 def controls_list():
@@ -375,10 +353,7 @@ def export_controls():
     return Response(output.getvalue(), mimetype='text/csv',
                      headers={'Content-Disposition': 'attachment;filename=control_mapping.csv'})
 
-
-# ---------------------------------------------------------------------------
 # Vendors
-# ---------------------------------------------------------------------------
 
 @app.route('/vendors')
 def vendors_list():
@@ -410,10 +385,7 @@ def vendors_delete(vendor_id):
     flash('Vendor removed.', 'info')
     return redirect(url_for('vendors_list'))
 
-
-# ---------------------------------------------------------------------------
 # Audit Findings
-# ---------------------------------------------------------------------------
 
 @app.route('/audits')
 def audits_list():
@@ -458,10 +430,7 @@ def audits_delete(finding_id):
     flash('Finding deleted.', 'info')
     return redirect(url_for('audits_list'))
 
-
-# ---------------------------------------------------------------------------
 # Policies
-# ---------------------------------------------------------------------------
 
 @app.route('/policies')
 def policies_list():
